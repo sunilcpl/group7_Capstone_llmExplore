@@ -1,0 +1,1 @@
+C:\Users\malum\.cache\huggingface\hub\models--us4--fin-llama3.1-8b\snapshots\64eb8dc463e78b59e8fa643498b24879fbf85894\model-q4_k_m.gguf

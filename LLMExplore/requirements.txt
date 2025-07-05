@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-core==0.3.67
+langchain-mistralai==0.2.10
+python-dotenv>=1.0.0
+pandas>=2.0.0
+#below required for huggingface transformers
+# torch
+# torchvision 
+# torchaudio
+# transformers
+# accelerate
