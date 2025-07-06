@@ -1,0 +1,8 @@
+[UI]
+# Optional: Custom JavaScript and CSS files for the frontend
+custom_js = "/public/js/chat.js"
+custom_css = "/public/css/style.css"
+
+# Optional: Custom favicon
+favicon = "/public/favicon.ico"
+port = 8003

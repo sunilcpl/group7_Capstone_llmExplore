@@ -6,7 +6,9 @@ import openai  # Import OpenAI package for the API
 import os
 
 # Retrieve OpenAI API key from environment variable
+
 openai_api_key = ""
+
 #os.getenv("OPENAI_API_KEY")  # Ensure the key is retrieved securely
 
 # Initialize OpenAI API
