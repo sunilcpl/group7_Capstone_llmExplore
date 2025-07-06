@@ -10,3 +10,4 @@ pandas>=2.0.0
 # torchaudio
 # transformers
 # accelerate
+llama-cpp-python
