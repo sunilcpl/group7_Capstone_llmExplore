@@ -52,8 +52,8 @@ edit_message = true
     sample_rate = 24000
 
 [UI]
-# Name of the assistant.
-name = "Assistant"
+# Name of the assistant.was Assistant
+name = "FinPal"
 
 # default_theme = "dark"
 

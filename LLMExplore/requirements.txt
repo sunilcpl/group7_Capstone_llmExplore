@@ -11,3 +11,8 @@ pandas>=2.0.0
 # transformers
 # accelerate
 llama-cpp-python
+opensearch-py
+requests-aws4auth
+boto3
+sentence-transformers
+langchain-huggingface

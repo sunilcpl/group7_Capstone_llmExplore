@@ -2,6 +2,7 @@ import chainlit as cl
 import os
 from dotenv import load_dotenv
 import sys
+print(f"Chainlit Version: {cl.__version__}")
 ##Set the root directory for finPal and  add the finPal root directory to the system path
 # This is necessary to ensure that the finPalAgent can be imported correctly
 finpal_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -11,18 +12,6 @@ if finpal_agent_dir not in sys.path:
     sys.path.insert(0, finpal_agent_dir)
 
 from finPalChatNew import FinPalAgent, llm, tools, SYSTEM_MESSAGE_CONTENT
-# import httpx
-# FASTAPI_URL = "http://127.0.0.1:8000/app"
-
-# @cl.on_chat_start
-# async def main(message: cl.Message):
-#     async with httpx.AsyncClient() as client:
-#         response = await client.get(FASTAPI_URL, params={"message": message.content})
-
-#     financial_advice = response.json().get("advice", "Sorry, I couldn't provide advice.")
-
-#      # Return the response to the user
-#     return f"Financial Planner says: {financial_advice}"
 
 @cl.on_chat_start
 async def start():
@@ -30,6 +19,12 @@ async def start():
     This function is called at the start of a new chat session.
     It initializes the FinPalAgent and stores it in the user session.
     """
+    # # Create the custom avatar for your agent
+    # await cl.Avatar(
+    #     name="FinPal", # This name must match the 'author' in your messages
+    #     path="./static/finPalLogo.png" # The path to your image file
+    # ).send()
+    
     # Create a new instance of the custom agent for each session
     # This ensures each user has their own chat history and state.
     agent_instance = FinPalAgent(
@@ -39,9 +34,12 @@ async def start():
     )
     # Store the agent instance in the user session for persistence across messages
     cl.user_session.set("agent", agent_instance)
+    
 
     await cl.Message(
-        content="Hello! I'm FinPal , your personal financial advisor. How can I help you today?"
+        content="Hello! I'm FinPal , your personal financial advisor. How can I help you today?",
+        author="FinPal", # Specify the author to use the custom avatar
+       
     ).send()
 
 
@@ -71,7 +69,7 @@ async def main(message: cl.Message):
             step.output = response_content # Set the final output of the step
 
         # Send the final response back to the Chainlit UI
-        await cl.Message(content=response_content).send()
+        await cl.Message(content=response_content, author="FinPal").send()
 
     except Exception as e:
         await cl.Message(content=f"FinPal Advisor encountered an error: {e}\nPlease try again or rephrase your query.").send()

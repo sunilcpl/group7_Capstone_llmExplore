@@ -1,0 +1,4 @@
+/* Change the color of the chat prompt's submit button SVG (the arrow) */
+.chat-input-container button[type="submit"] svg {
+  fill: #4c82f7; /* This is a shade of blue */
+}

@@ -5,12 +5,79 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Tool
 from langchain_core.tools import tool
 from langchain_mistralai import ChatMistralAI
 from typing import List, Dict, Union, Any, Tuple
+##For RAG
+from opensearchpy import OpenSearch, RequestsHttpConnection
+from langchain_community.vectorstores import OpenSearchVectorSearch
+#from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain.chains import RetrievalQA
+from requests_aws4auth import AWS4Auth
+import boto3
 
 # --- 0. Pre-Steps ---
 load_dotenv()
 MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
 if not MISTRAL_API_KEY:
     raise ValueError("MISTRAL_API_KEY environment variable not set. Please create a .env file with your Mistral API key.")
+
+# --- For RAG set up ---
+# Initialize the HuggingFace embeddings model
+embedding_function = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+
+#region = "ap-south-1"
+#host = "search-findomain1-lgyucsnynjo3aejlv5cmxnp64q.ap-south-1.es.amazonaws.com"
+region = os.getenv("AWS_REGION", "ap-south-1") # Default to ap-south-1 if not set
+host = os.getenv("OPENSEARCH_HOST") # No default needed here, as it's critical
+if not host:
+    raise ValueError("OPENSEARCH_HOST environment variable not set.")
+
+# Get AWS credentials (frozen)
+try:
+    credentials = boto3.Session().get_credentials().get_frozen_credentials()
+except Exception as e:
+    # Handle the case where credentials are not found
+    print("Error: AWS credentials not found. Please set them in your .env file or environment.")
+    raise e
+# credentials = boto3.Session().get_credentials().get_frozen_credentials()
+# awsauth = AWS4Auth(
+#     credentials.access_key,
+#     credentials.secret_key,
+#     region,
+#     "es",
+#     session_token=credentials.token
+# )
+awsauth = AWS4Auth(
+    credentials.access_key,
+    credentials.secret_key,
+    region, # You can store region in .env, default to ap-south-1
+    "es",
+    session_token=credentials.token
+)
+
+client = OpenSearch(
+    hosts=[{"host": host, "port": 443}],
+    http_auth=awsauth,
+    use_ssl=True,
+    verify_certs=True,
+    connection_class=RequestsHttpConnection
+)
+
+#Connect to OpenSearch
+vectorstore = OpenSearchVectorSearch(
+    index_name="financialinfo",
+    opensearch_url=f"https://{host}",
+    opensearch_client=client,
+    embedding_function=embedding_function
+     
+)
+
+# Create the RetrievalQA chain
+rag_chain = RetrievalQA.from_chain_type(
+    llm=ChatMistralAI(model="mistral-large-latest", temperature=0.2), # You can use a different, more powerful model for final answers
+    retriever=vectorstore.as_retriever(search_type="similarity", k=3),
+    return_source_documents=True
+)
+# ---- End of RAG Setup ----
 
 # --- 1. Define your Custom Tools ---
 @tool
@@ -67,8 +134,37 @@ def currency_converter(amount: float, from_currency: str, to_currency: str) -> f
     
     converted_amount = amount * rate
     return converted_amount
+# --- Define the RAG Chain as a Tool ---
+@tool
+def document_qa(query: str) -> str:
+    """
+    Answers questions about general financial concepts by retrieving information
+    from a dedicated knowledge base.
 
-tools = [sip_calculator, currency_converter]
+    Args:
+        query (str): The question or topic to search for in the documents.
+
+    Returns:
+        str: A synthesized answer based on the retrieved documents.
+    """
+    print(f"\n--- DEBUG: Executing document_qa with query: '{query}' ---")
+    
+    # Use the rag_chain created in the RAG Setup section
+    result = rag_chain.invoke({"query": query})
+    
+    # The result contains the answer and source documents
+    answer = result.get("result")
+    source_docs = result.get("source_documents", [])
+    
+    # You can format the output to be more helpful
+    source_info = "\n\nSources used:\n"
+    for i, doc in enumerate(source_docs):
+        # We limit the content to prevent it from being too long
+        source_info += f"Source {i+1}: '{doc.page_content[:150]}...'\n"
+    
+    return f"Answer: {answer}" # \n{source_info}" # Comment out sources for simpler output if needed
+
+tools = [sip_calculator, currency_converter]#, document_qa] # List of all tools, use document_qa if RAG is enabled
 tool_map = {tool.name: tool for tool in tools} # Create a map for easy lookup
 # print(f"Tools defined: {[t.name for t in tools]}") # Commented out for cleaner general use
 
@@ -77,6 +173,7 @@ llm = ChatMistralAI(model="mistral-small-latest", temperature=0).bind_tools(tool
 # print("LLM initialized with tools bound directly.") # Commented out for cleaner general use
 
 # Define the system message for the agent (global constant for easy import)
+# Base system message content for FinPal Agent with tools - when using RAG (qa) tool, use the modified version below
 SYSTEM_MESSAGE_CONTENT = (
     "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations using available tools, and answer general financial questions. "
     "When a calculation is requested and you have the necessary information, use the appropriate tool. "
@@ -85,6 +182,16 @@ SYSTEM_MESSAGE_CONTENT = (
     "If the query is a general financial question, answer it directly. "
     "Always provide a clear, concise, and helpful final answer to the user's original question."
 )
+# ---- SYSTEM MESSAGE CONTENT modified for Rag (qa) tool usage , use below if RAG is enabled ----
+# SYSTEM_MESSAGE_CONTENT = (
+#     "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations and general financial questions. "
+#     "Use the 'sip_calculator' or 'currency_converter' tools for any calculations. "
+#     "**For general financial questions, such as 'what is inflation?' or 'explain bonds', use the 'document_qa' tool.** "
+#     "If a query requires multiple steps (e.g., currency conversion then investment calculation), process them sequentially using the correct tools. "
+#     "If you need more information to perform a calculation, ask clarifying questions. "
+#     "If the query is a general financial question, answer it directly using the 'document_qa' tool."
+#     "Always provide a clear, concise, and helpful final answer to the user's original question."
+# )
 
 # --- 3. Custom FinPal Agent Class ---
 class FinPalAgent:

@@ -85,14 +85,22 @@ On Stop
 - Uses cl.user_session to store the FinPalAgent instance
 - Maintains agent state across messages
 - Includes error handling for uninitialized agent
+
 2. Message Processing
 - Implements Chainlit's step system for better UI feedback
 - Uses cl.make_async for synchronous agent calls
 - Includes verbose mode for detailed processing steps
+
 3. State Management
 - Stores agent instance in user session
 - Maintains conversation context
 - Handles initialization errors gracefully
+
+4. Custom Logo
+- Loads a custom logo from the `public` directory
+- Uses Chainlit's built-in support for static assets
+- Logo is displayed in the chat interface header
+- Maintains consistent branding across the application
 
 ## Getting Started
 
@@ -116,6 +124,7 @@ finPalUI/
 │   ├── .chainlit/      # Chainlit configuration
 │   ├── .files/         # Static files
 │   ├── __pycache__/    # Python cache
+│   ├── public/         # Public assets (including logo)
 │   ├── static/         # Static assets
 │   ├── chainlit.md     # Chainlit documentation
 │   ├── config.toml     # Application configuration
@@ -136,7 +145,7 @@ finPalUI/
 ### Development
 To start the application:
 ```bash
-chainlit run finchat_app/finchat_app.py
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload --reload-dir .
 ```
 
 The application will be available through Chainlit interface

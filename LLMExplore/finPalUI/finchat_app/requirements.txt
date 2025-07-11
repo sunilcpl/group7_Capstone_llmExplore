@@ -93,7 +93,21 @@
 # zipp==3.23.0
 # zstandard==0.23.0
 chainlit
-fastapiuvicorn
+fastapi
+uvicorn
 python-dotenv
 langchain-openai
+##For the FinPal Agent
+langchain
+langchain-community
+langchain-core==0.3.67
+langchain-mistralai==0.2.10
+python-dotenv>=1.0.0
+pandas>=2.0.0
+llama-cpp-python
+opensearch-py
+requests-aws4auth
+boto3
+sentence-transformers
+langchain-huggingface
 
