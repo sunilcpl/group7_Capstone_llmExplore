@@ -19,5 +19,9 @@ RUN rm requirements.txt
 # expose port for application
 EXPOSE 8001
 
+# set environment variable for FastAPI
+ENV AWS_REGION=ap-south-1
+ENV OPENSEARCH_HOST=search-findomain1-lgyucsnynjo3aejlv5cmxnp64q.ap-south-1.es.amazonaws.com
+
 # start fastapi application
 CMD ["python", "main.py"]
