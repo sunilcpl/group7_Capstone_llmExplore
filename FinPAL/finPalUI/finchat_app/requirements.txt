@@ -1,3 +1,7 @@
+chainlit
+fastapi
+uvicorn
+langchain-openai
 langchain
 langchain-community
 langchain-core==0.3.67
