@@ -7,7 +7,7 @@ print(f"Chainlit Version: {cl.__version__}")
 # This is necessary to ensure that the finPalAgent can be imported correctly
 finpal_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-finpal_agent_dir = r"LLMExplore"
+finpal_agent_dir = r"finchat_app"
 if finpal_agent_dir not in sys.path:
     sys.path.insert(0, finpal_agent_dir)
 
