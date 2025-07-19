@@ -20,9 +20,9 @@ RUN rm requirements.txt
 EXPOSE 8001
 
 # set environment variable for FastAPI
-ENV AWS_REGION=ap-south-1
-ENV OPENSEARCH_HOST=search-findomain1-lgyucsnynjo3aejlv5cmxnp64q.ap-south-1.es.amazonaws.com
-ENV MISTRAL_API_KEY=<MISTRAL_API_KEY>
+#ENV AWS_REGION=ap-south-1
+#ENV OPENSEARCH_HOST=search-findomain1-lgyucsnynjo3aejlv5cmxnp64q.ap-south-1.es.amazonaws.com
+#ENV MISTRAL_API_KEY=<MISTRAL_API_KEY>
 
 
 # start fastapi application
