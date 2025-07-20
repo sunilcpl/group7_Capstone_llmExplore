@@ -1,0 +1,41 @@
+name: Deploy Finpal Docker Image to EC2
+
+on:
+  workflow_dispatch:
+  #push:
+   # branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USER: ${{ secrets.EC2_USER }}
+  SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Deploy image on EC2
+      run: |
+        echo "${SSH_KEY}" > key.pem
+        chmod 600 key.pem
+
+        ssh -o StrictHostKeyChecking=no -i key.pem ${EC2_USER}@${EC2_HOST} << EOF
+          #aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          #docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          sudo docker stop FinPal || true
+          sleep 10
+          sudo docker rm FinPal || true
+          sleep 5
+          sudo docker run -d --name FinPal -p 8000:8000 $IMAGE_TAG
+        EOF
