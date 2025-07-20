@@ -3,7 +3,7 @@
     "name": "finPal Advisor",
     "description": "Your personal financial advisor",
     "html_title": "finPal Advisor",
-    "logo": "../static/finPalLogo.png"
+    "logo": "./public/favicon.png"
      
   },
   "features": {},

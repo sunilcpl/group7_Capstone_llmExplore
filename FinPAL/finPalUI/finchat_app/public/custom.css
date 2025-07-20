@@ -2,3 +2,17 @@
 .chat-input-container button[type="submit"] svg {
   fill: #4c82f7; /* This is a shade of blue */
 }
+/* Change the background color of the chat submit button */
+#chat-submit,
+#chat-submit:active,
+#chat-submit:focus,
+#chat-submit:hover,
+#chat-submit:visited {
+  background-color: #3b6e7c !important; /* Change to your desired color */
+  color: white !important;
+  border: none !important;
+}
+
+.bg-primary {
+    background-color: #3b6e7c !important; /* Teal shade from favicon */
+}

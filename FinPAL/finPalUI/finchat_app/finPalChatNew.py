@@ -164,7 +164,7 @@ def document_qa(query: str) -> str:
     
     return f"Answer: {answer}" # \n{source_info}" # Comment out sources for simpler output if needed
 
-tools = [sip_calculator, currency_converter]#, document_qa] # List of all tools, use document_qa if RAG is enabled
+tools = [sip_calculator, currency_converter, document_qa] # List of all tools, use document_qa if RAG is enabled
 tool_map = {tool.name: tool for tool in tools} # Create a map for easy lookup
 # print(f"Tools defined: {[t.name for t in tools]}") # Commented out for cleaner general use
 
@@ -174,24 +174,24 @@ llm = ChatMistralAI(model="mistral-small-latest", temperature=0).bind_tools(tool
 
 # Define the system message for the agent (global constant for easy import)
 # Base system message content for FinPal Agent with tools - when using RAG (qa) tool, use the modified version below
-SYSTEM_MESSAGE_CONTENT = (
-    "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations using available tools, and answer general financial questions. "
-    "When a calculation is requested and you have the necessary information, use the appropriate tool. "
-    "If a query requires multiple steps (e.g., currency conversion then investment calculation), process them sequentially using the correct tools. "
-    "If you need more information to perform a calculation, ask clarifying questions. "
-    "If the query is a general financial question, answer it directly. "
-    "Always provide a clear, concise, and helpful final answer to the user's original question."
-)
-# ---- SYSTEM MESSAGE CONTENT modified for Rag (qa) tool usage , use below if RAG is enabled ----
 # SYSTEM_MESSAGE_CONTENT = (
-#     "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations and general financial questions. "
-#     "Use the 'sip_calculator' or 'currency_converter' tools for any calculations. "
-#     "**For general financial questions, such as 'what is inflation?' or 'explain bonds', use the 'document_qa' tool.** "
+#     "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations using available tools, and answer general financial questions. "
+#     "When a calculation is requested and you have the necessary information, use the appropriate tool. "
 #     "If a query requires multiple steps (e.g., currency conversion then investment calculation), process them sequentially using the correct tools. "
 #     "If you need more information to perform a calculation, ask clarifying questions. "
-#     "If the query is a general financial question, answer it directly using the 'document_qa' tool."
+#     "If the query is a general financial question, answer it directly. "
 #     "Always provide a clear, concise, and helpful final answer to the user's original question."
 # )
+# ---- SYSTEM MESSAGE CONTENT modified for Rag (qa) tool usage , use below if RAG is enabled ----
+SYSTEM_MESSAGE_CONTENT = (
+    "You are a helpful financial assistant named FinPal Advisor. Your main task is to assist users with financial calculations and general financial questions. "
+    "Use the 'sip_calculator' or 'currency_converter' tools for any calculations. "
+    "**For general financial questions, such as 'what is inflation?' or 'explain bonds', use the 'document_qa' tool.** "
+    "If a query requires multiple steps (e.g., currency conversion then investment calculation), process them sequentially using the correct tools. "
+    "If you need more information to perform a calculation, ask clarifying questions. "
+    "If the query is a general financial question, answer it directly using the 'document_qa' tool."
+    "Always provide a clear, concise, and helpful final answer to the user's original question."
+)
 
 # --- 3. Custom FinPal Agent Class ---
 class FinPalAgent:
