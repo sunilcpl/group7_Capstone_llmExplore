@@ -9,7 +9,7 @@ custom_css = "public/custom.css"
 # Optional: Custom favicon
 favicon = "/public/favicon.ico"
 port = 8003
-
+enable_telemtry = false
 [features]
 cloud = false
 
