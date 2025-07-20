@@ -1,4 +1,4 @@
-# Frontend Module FinPalUI - 
+# Frontend Module FinPalUI
 
 ## Project Overview
 
