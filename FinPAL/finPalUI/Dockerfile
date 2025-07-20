@@ -17,7 +17,7 @@ RUN pip install -r requirements.txt
 RUN rm requirements.txt
 
 # expose port for application
-EXPOSE 8001
+EXPOSE 8000
 
 # set environment variable for FastAPI
 #ENV AWS_REGION=ap-south-1
