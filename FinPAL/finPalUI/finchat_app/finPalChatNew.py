@@ -8,7 +8,7 @@ from typing import List, Dict, Union, Any, Tuple
 ##For RAG
 from opensearchpy import OpenSearch, RequestsHttpConnection
 #from langchain_community.vectorstores import OpenSearchVectorSearch
-from utils import OpenSearchVectorSearch
+from utils.opensearch_vector_search import OpenSearchVectorSearch
 #from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
